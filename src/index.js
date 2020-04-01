@@ -1,11 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+import 'bootstrap/dist/css/bootstrap.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
+import Root from './containers/Root';
+import configureStore from './store';
+
+// CLIENT SIDE RENDERING -- 2 segundos <<<< 1 segundo
+
+// SEO -- Server Side Rendering
+const store = configureStore();
+
 ReactDOM.render(
-    <App />,
+    <Root store={store} App={App}/>,
     document.getElementById('root')
 );
 
