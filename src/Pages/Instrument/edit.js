@@ -1,45 +1,143 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, {PureComponent} from 'react';
+import {connect} from 'react-redux';
 import {
-    fetchInstrumentsRequested
+    fetchInstrumentRequested, // fetch One, para edicion <<<
+    submitInstrumentRequested, // Sagas / Api Action <<< 
+    updateInstrumentData // Only Reducers <<< 
 } from '../../actions/instrument'
 
-const Edit = (props) => {
-    console.log(props);
-    const dispatch = useDispatch();
-    const [instruments] = useSelector(state => state.instrument.documents.instruments);
-    if (props.match.params.code) {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useEffect(() => dispatch(fetchInstrumentsRequested(props.match.params)), [
-            dispatch,
-            props.match.params
-        ]);
+import {
+    Row,
+    Col,
+    Container,
+    Button,
+    Form,
+    FormGroup,
+    Label,
+    Input
+} from 'reactstrap';
+
+import map from 'lodash/map';
+import get from 'lodash/get';
+import set from 'lodash/set';
+
+const fieldsData = [
+    {
+        control: 'hexcode',
+        label: 'Código Hex',
+        path: 'hexcode',
+        value: null,
+        type: 'text'
+    },
+    {
+        control: 'family',
+        label: 'Familia',
+        path: 'family',
+        value: null,
+        type: 'text'
+    },
+    {
+        control: 'instrument',
+        label: 'Instrument',
+        path: 'instrument',
+        value: null,
+        type: 'text'
+    }
+];
+
+class Edit extends PureComponent {
+    /*componentDidMount() se invoca inmediatamente después de que un componente se monte.*/
+    componentDidMount() {
+        if (this.props.match.params.id) {
+            this.props.getInstrument();
+        }
     }
 
-    return (
-        <div>
-            <center><h3><b>Edicion del Instrumento</b></h3></center>
-            <form className="text-center">
-                <label for="family">
-                    Familia del Instrumento: 
-                <input id="family" type="text" family="family" placeholder="Entrada de la familia" required/>
-                </label>
-                <br/>
-                <br/>
-                <label for="name">
-                    Nombre del Instrumento:
-                <input id="name" type="text" instrument="instrument" placeholder="Entrada del instrumento" required />
-                </label>
-                <br/>
-                <br/>
-                <label for="hexcode">
-                    Código Hex del Instrumento:
-                <input id="hexcode" type="number" hexcode="hexcode" placeholder="Entrada del código hex" required />
-                </label>
-                <br/>
-                <input type="submit" value="Enviar Modificacion" />
-            </form>
-        </div>
-    )
-};
-export default Edit;
+    handleSubmit(event) {//es una funcio reservada?//handle se usa en funciones referidas a eventos?
+
+        event.preventDefault();//en React no puedes retornar false 
+                            //para prevenir el comportamiento por defecto. 
+                            //Debes, explícitamente, llamar preventDefault.
+        this.props.submitInstrument()
+    }
+
+    //render() Un componente con una render prop toma una función
+    //que devuelve un elemento de React y lo
+    //llama en lugar de implementar su propia
+    //lógica de representación.
+    render() {
+        const {fields} = this.props;
+        return (
+            <Container>
+                <Row>
+                    <Col>
+                        <Form onSubmit={e => this.handleSubmit(e)}>
+                            {map(fields, field => (
+                                <FormGroup>
+                                    <Label>
+                                        {field.label}
+                                        <br/>
+                                        <Input
+                                            key={field.control}
+                                            name={field.control}
+                                            {...field}
+                                        >
+                                        </Input>
+                                    </Label>
+                                </FormGroup>
+                            ))}
+                            <Button>
+                                Submit
+                            </Button>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
+        )
+    };
+}
+
+const mapStateToProps = state => {
+    const {instrument, loading} = state.instrument.documents;
+    const fields = map(fieldsData, field => ({
+        ...field,
+        value: get(state.instrument.documents.instrument, field.path, '')
+    }));
+    return {
+        fields,
+        instrument,
+        loading
+    }
+}
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+    const {id} = ownProps.match.params;
+    return {
+        getInstrument: () => dispatch(fetchInstrumentRequested(id)),
+        updateInstrument: car => dispatch(updateInstrumentData(car)),
+        submitInstrument: () => dispatch(submitInstrumentRequested())
+    }
+}
+
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+
+    const megedFields = map(stateProps.fields, field => ({
+        ...field,
+        onChange: ({target: {value}}) => dispatchProps.updateInstrument(set(
+            stateProps.instrument, field.path, value
+        ))
+    }));
+
+    return {
+        ...stateProps,
+        ...dispatchProps,
+        ...ownProps,
+        fields: megedFields
+    }
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    mergeProps
+)(Edit);
