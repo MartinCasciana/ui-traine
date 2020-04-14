@@ -2,7 +2,7 @@ import {
     FETCH_CARS_SUCCEEDED,
     FETCH_CARS_REQUESTED,
     SORT_CAR,
-    EDIT_CAR
+    //EDIT_CAR
 } from '../../actions/car';
 
 import orderBy from 'lodash/orderBy';

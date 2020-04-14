@@ -1,7 +1,7 @@
 import {
     call,
     put,
-    delay
+    //delay
 } from 'redux-saga/effects';
 
 import CountryAPI from '../Api/country';
@@ -15,7 +15,7 @@ export function* fetchCountries({filter}) {
             CountryAPI.fetch,
             filter
         );
-        yield delay(1500);
+        //yield delay(1500);
         yield put(
             fetchCountriesSucceeded(countries, limit, total)
         );

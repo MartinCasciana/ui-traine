@@ -24,7 +24,8 @@ const initialState = {
         },
         {
             id: 'year',
-            label: 'Año'
+            label: 'Año',
+            sort: 'desc'
         },
         {
             id: 'createdAt',

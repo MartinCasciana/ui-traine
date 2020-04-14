@@ -2,7 +2,7 @@ import {
     FETCH_INSTRUMENTS_SUCCEEDED,
     FETCH_INSTRUMENTS_REQUESTED,
     SORT_INSTRUMENT,
-    EDIT_INSTRUMENT
+   // EDIT_INSTRUMENT
 } from '../../actions/instrument';
 
 import orderBy from 'lodash/orderBy';

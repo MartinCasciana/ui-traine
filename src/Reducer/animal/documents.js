@@ -2,7 +2,7 @@ import {
     FETCH_ANIMALS_SUCCEEDED,
     FETCH_ANIMALS_REQUESTED,
     SORT_ANIMAL,
-    EDIT_ANIMAL
+   // EDIT_ANIMAL
 } from '../../actions/animal';
 
 import orderBy from 'lodash/orderBy'

@@ -1,7 +1,7 @@
 import {
     call,
     put,
-    delay
+    //delay
 } from 'redux-saga/effects';
 
 import CarAPI from '../Api/car';
@@ -15,7 +15,7 @@ export function* fetchCars({filter}) {
             CarAPI.fetch,
             filter
         );
-        yield delay(1500);
+        //yield delay(1500);
         yield put(
             fetchCarsSucceeded(cars, limit, total)
         );

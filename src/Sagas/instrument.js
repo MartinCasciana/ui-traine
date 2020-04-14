@@ -1,7 +1,7 @@
 import {
     call,
     put,
-    delay
+    //delay
 } from 'redux-saga/effects';
 
 import InstrumentAPI from '../Api/instrument';
@@ -15,7 +15,7 @@ export function* fetchInstruments({filter}) {
             InstrumentAPI.fetch,
             filter
         );
-        yield delay(1500);
+        //yield delay(1500);
         yield put(
             fetchInstrumentsSucceeded(instruments, limit, total)
         );
