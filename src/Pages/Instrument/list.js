@@ -7,15 +7,27 @@ import {
     Button,
     Row,
     Col,
-    Spinner
+    Spinner,
+    ButtonGroup,
+    Modal,
+    ModalFooter,
+    ModalHeader,
+    ModalBody
 } from 'reactstrap';
 
 import {
     fetchInstrumentsRequested,
-    sortInstrument
-} from '../../actions/instrument'
+    sortInstrument,
+    deleteInstrumentRequested
+} from '../../actions/country'
 
 class App extends PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            modal: null
+        };
+    }
     componentDidMount() {
         this.props.getInstruments();
     }
@@ -33,6 +45,8 @@ class App extends PureComponent {
             onSort,
             loading
         } = this.props;
+
+        const {modal} = this.state;
         return (
             <Container>
                 <Row>
@@ -40,7 +54,7 @@ class App extends PureComponent {
                         <h3>Tabla de datos </h3>
                     </Col>
                     <Col sm="3">
-                        <Button color="primary" tag={Link} to="/instrument/edit/new"> Nuevo </Button>
+                        <Button color="primary" tag={Link} to="/instruments/edit/new"> Nuevo </Button>
                     </Col>
                 </Row>
                 <hr/>
@@ -56,11 +70,36 @@ class App extends PureComponent {
                                 onSort,
                                 limit,
                                 total,
-                                onPageClick: this.handlePagination
+                                onPageClick: this.handlePagination,
+                                onDelete: modal => this.setState({modal}),
+                                linkTo: 'instruments'
                             }}/>
                         )}
                     </Col>
                 </Row>
+                {modal && (
+                    <Modal isOpen>
+                        <ModalHeader>
+                            Te voy a borrar
+                        </ModalHeader>
+                        <ModalBody>
+                            Confirme Accion {modal.hexcode} {modal.family} {modal.instrument}
+                        </ModalBody>
+                        <ModalFooter>
+                            <ButtonGroup>
+                                <Button color="warning" onClick={() => {
+                                    this.props.deleteInstrument(modal.id)
+                                    this.setState({modal: null})
+                                }} >
+                                    Aceptar
+                                </Button>
+                                <Button color="info" onClick={() => this.setState({modal: null})}>
+                                    Cancelar
+                                </Button>
+                            </ButtonGroup>
+                        </ModalFooter>
+                    </Modal>
+                )}
             </Container>
         )
     }
@@ -79,7 +118,8 @@ const mapStateToProps = (state /* nuestro Store */, ownProps /*  */ ) => {
 
 const mapDispatchToProps = (dispatch /* acciones a disparar */, ownProps /*  */ ) => ({
     getInstruments: filters => dispatch(fetchInstrumentsRequested(filters)),
-    onSort: sort => dispatch(sortInstrument(sort))
+    onSort: sort => dispatch(sortInstrument(sort)),
+    deleteInstrument: id => dispatch(deleteInstrumentRequested(id))
 })
 
 export default connect(

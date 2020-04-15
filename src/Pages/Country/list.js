@@ -7,29 +7,34 @@ import {
     Button,
     Row,
     Col,
-    Spinner
+    Spinner,
+    ButtonGroup,
+    Modal,
+    ModalFooter,
+    ModalHeader,
+    ModalBody
 } from 'reactstrap';
 
 import {
     fetchCountriesRequested,
-    sortCountry
+    sortCountry,
+    deleteCountryRequested
 } from '../../actions/country'
 
 class App extends PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            modal: null
+        };
+    }
     componentDidMount() {
         this.props.getCountries();
     }
 
     handlePagination = (skip) => {
         this.props.getCountries({skip});
-    } 
-    removeCountry(index) {
-        this.setState({
-          countries: this.state.countries.filter((e, i) => {
-            return i !== index
-          })
-        });
-      }
+    }
 
     render() {
         const {
@@ -40,14 +45,16 @@ class App extends PureComponent {
             onSort,
             loading
         } = this.props;
+
+        const {modal} = this.state;
         return (
             <Container>
                 <Row>
                     <Col>
                         <h3>Tabla de datos </h3>
                     </Col>
-                    <Col sm="0">
-                        <Button color="primary" tag={Link} to="/country/edit/new"> Nuevo </Button>
+                    <Col sm="3">
+                        <Button color="primary" tag={Link} to="/countries/edit/new"> Nuevo </Button>
                     </Col>
                 </Row>
                 <hr/>
@@ -64,11 +71,35 @@ class App extends PureComponent {
                                 limit,
                                 total,
                                 onPageClick: this.handlePagination,
-                                linkTo: "country"
+                                onDelete: modal => this.setState({modal}),
+                                linkTo: 'countries'
                             }}/>
                         )}
                     </Col>
                 </Row>
+                {modal && (
+                    <Modal isOpen>
+                        <ModalHeader>
+                            Te voy a borrar
+                        </ModalHeader>
+                        <ModalBody>
+                            Confirme Accion {modal.name} {modal.code} {modal.iso2}
+                        </ModalBody>
+                        <ModalFooter>
+                            <ButtonGroup>
+                                <Button color="warning" onClick={() => {
+                                    this.props.deleteCountry(modal.id)
+                                    this.setState({modal: null})
+                                }} >
+                                    Aceptar
+                                </Button>
+                                <Button color="info" onClick={() => this.setState({modal: null})}>
+                                    Cancelar
+                                </Button>
+                            </ButtonGroup>
+                        </ModalFooter>
+                    </Modal>
+                )}
             </Container>
         )
     }
@@ -87,7 +118,8 @@ const mapStateToProps = (state /* nuestro Store */, ownProps /*  */ ) => {
 
 const mapDispatchToProps = (dispatch /* acciones a disparar */, ownProps /*  */ ) => ({
     getCountries: filters => dispatch(fetchCountriesRequested(filters)),
-    onSort: sort => dispatch(sortCountry(sort))
+    onSort: sort => dispatch(sortCountry(sort)),
+    deleteCoumty: id => dispatch(deleteCountryRequested(id))
 })
 
 export default connect(
